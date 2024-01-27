@@ -55,6 +55,23 @@ def test_clienv_is_all(user_input: str, expected: bool) -> None:
     assert CliEnv(user_input).is_all is expected
 
 
+def test_clienv_append() -> None:
+    ce = CliEnv()
+    assert tuple(ce) == ()
+
+    ce.append("ab")
+    assert tuple(ce) == ("ab",)
+    ce.append("cd")
+    assert tuple(ce) == ("ab", "cd")
+    ce.append(" ef, gh ")
+    assert tuple(ce) == ("ab", "cd", "ef", "gh")
+
+
+# This (correctly) would fail to type-check; we're relying on that to make sure that nobody calls it like this.
+# with pytest.raises(ValueError):
+#    ce.append(["xx"])
+
+
 def test_env_select_lazily_looks_at_envs() -> None:
     state = State(get_options(), [])
     env_selector = EnvSelector(state)

@@ -45,15 +45,38 @@ class CliEnv:  # noqa: PLW1641
     - The default environments as chosen by tox configuration. This is instantiated with `None` as the parameter,
       `is_default_list()` will be true, and as a sequence this will be empty. This prints in string representation
       as ``<env_list>``.
+
+    Additional environment names may be added to a `CliEnv` object by calling the `append()` method. This allows the
+    user to specify multiple ``-e`` options.
     """
 
     def __init__(self, names: None | list[str] | str = None) -> None:
         if isinstance(names, str):
-            names = [nm for nm in map(str.strip, names.split(",")) if nm]
+            names = self.parse_names_str(names)
         if names is not None and not all(names):
             msg = f"Empty environment names not allowed: '{names}'"
             raise ValueError(msg)
         self._names: list[str] | None = names
+
+    @staticmethod
+    def parse_names_str(names: str) -> list[str]:
+        return [nm for nm in map(str.strip, names.split(",")) if nm]
+
+    def append(self, names_str: str) -> None:
+        """XXX Discuss that it appends multiple, because it's designed to be
+        used by `ArgumentParser`.
+        """
+        #   We currently need accept only `str`, so don't yet determine an API design for other types.
+        if not isinstance(names_str, str):
+            msg = "CliEnv.append() accepts only str"
+            raise TypeError(msg)
+
+        #   Note that this avoids having to test separate code paths for the `None` vs [...] case.
+        if self._names is None:
+            self._names = []
+
+        for nm in self.parse_names_str(names_str):
+            self._names.append(nm)
 
     def __iter__(self) -> Iterator[str]:
         if not self.is_all and self._names is not None:  # pragma: no branch
