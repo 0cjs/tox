@@ -6,9 +6,8 @@ from collections import Counter
 from dataclasses import dataclass
 from difflib import get_close_matches
 from itertools import chain
-from typing import TYPE_CHECKING, Dict, Iterable, Iterator, List, cast
+from typing import TYPE_CHECKING, Dict, Iterable, Iterator, cast
 
-from tox.config.loader.str_convert import StrConvert
 from tox.config.types import EnvList
 from tox.report import HandledError
 from tox.tox_env.api import ToxEnvCreateArgs
@@ -46,10 +45,10 @@ class CliEnv:  # noqa: PLW1641
       as ``<env_list>``.
     """
 
-    def __init__(self, value: None | list[str] | str = None) -> None:
-        if isinstance(value, str):
-            value = StrConvert().to(value, of_type=List[str], factory=None)
-        self._names: list[str] | None = value
+    def __init__(self, names: None | list[str] | str = None) -> None:
+        if isinstance(names, str):
+            names = [nm for nm in map(str.strip, names.split(",")) if nm]
+        self._names: list[str] | None = names
 
     def __iter__(self) -> Iterator[str]:
         if not self.is_all and self._names is not None:  # pragma: no branch
