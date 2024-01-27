@@ -30,6 +30,8 @@ class CliEnv:  # noqa: PLW1641
     or in a TOML file (typically ``env_list`` in ``tox.ini``). It may be treated as a sequence if it's not a "default"
     or "all" selection.
 
+    Environment names may not be empty strings.
+
     It is in one of three forms:
 
     - A list of specific environments, instantiated with a string that is a comma-separated list of the environment
@@ -48,6 +50,9 @@ class CliEnv:  # noqa: PLW1641
     def __init__(self, names: None | list[str] | str = None) -> None:
         if isinstance(names, str):
             names = [nm for nm in map(str.strip, names.split(",")) if nm]
+        if names is not None and not all(names):
+            msg = f"Empty environment names not allowed: '{names}'"
+            raise ValueError(msg)
         self._names: list[str] | None = names
 
     def __iter__(self) -> Iterator[str]:
