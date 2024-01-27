@@ -67,11 +67,6 @@ def test_clienv_append() -> None:
     assert tuple(ce) == ("ab", "cd", "ef", "gh")
 
 
-# This (correctly) would fail to type-check; we're relying on that to make sure that nobody calls it like this.
-# with pytest.raises(ValueError):
-#    ce.append(["xx"])
-
-
 def test_env_select_lazily_looks_at_envs() -> None:
     state = State(get_options(), [])
     env_selector = EnvSelector(state)
