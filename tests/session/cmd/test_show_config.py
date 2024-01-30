@@ -173,13 +173,16 @@ def test_show_config_pkg_env_skip(
 
 
 def test_show_config_select_only(tox_project: ToxProjectCreator) -> None:
-    project = tox_project({"tox.ini": "[tox]\nenv_list=\n a\n b", "pyproject.toml": ""})
-    result = project.run("c", "-e", ".pkg,b,.pkg")
+    """This serves also as a test for multiple ``-e`` options, which will catch missing tests for this in
+    ``tests/session/test_env_select.py``.
+    """
+    project = tox_project({"tox.ini": "[tox]\nenv_list=\n a\n b\n c", "pyproject.toml": ""})
+    result = project.run("c", "-e", ".pkg,b,.pkg", "-e", "c")
     result.assert_success()
     parser = ConfigParser(interpolation=None)
     parser.read_string(result.out)
     sections = list(parser.sections())
-    assert sections == ["testenv:.pkg", "testenv:b"]
+    assert sections == ["testenv:.pkg", "testenv:b", "testenv:c"]
 
 
 def test_show_config_alias(tox_project: ToxProjectCreator) -> None:
